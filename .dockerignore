@@ -1,0 +1,27 @@
+# Git & Version Control
+.git
+.gitignore
+.github
+
+# Dependencies & Build Output (rebuilt cleanly inside Docker builder stage)
+node_modules
+dist
+coverage
+*.tsbuildinfo
+
+# Environment & Local Secrets (NEVER bake secrets into images)
+.env
+.env.*
+!.env.example
+
+# Documentation & Reports (not needed in build context)
+docs
+README.md
+
+# Editor & OS Artifacts
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*

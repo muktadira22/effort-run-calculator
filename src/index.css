@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-canvas: #F5F5F0;
+
+  --color-trail-50: #F0FDF4;
+  --color-trail-100: #DCFCE7;
+  --color-trail-600: #16A34A;
+  --color-trail-700: #15803D;
+  --color-trail-800: #166534;
+  --color-trail-900: #14532D;
+
+  --color-asphalt-800: #1E293B;
+  --color-asphalt-900: #0F172A;
+  --color-asphalt-950: #020617;
+
+  --color-terracotta-50: #FFF7ED;
+  --color-terracotta-100: #FFEDD5;
+  --color-terracotta-600: #EA580C;
+  --color-terracotta-700: #C2410C;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

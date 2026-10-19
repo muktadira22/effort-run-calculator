@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trail-to-Road Effort Converter — Prototipe Desain UI/UX</title>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            canvas: '#F5F5F0',
+            trail: {
+              50: '#F0FDF4',
+              100: '#DCFCE7',
+              600: '#16A34A',
+              700: '#15803D',
+              800: '#166534',
+              900: '#14532D',
+            },
+            asphalt: {
+              800: '#1E293B',
+              900: '#0F172A',
+              950: '#020617',
+            },
+            terracotta: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              600: '#EA580C',
+              700: '#C2410C',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body class="bg-canvas text-slate-900 font-sans antialiased selection:bg-trail-700 selection:text-white min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION / HEADER (Zona 1) -->
+  <header class="bg-white border-b border-slate-200/80 sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-trail-800 text-white flex items-center justify-center shadow-sm shrink-0" aria-hidden="true">
+          <!-- Mountain & Road Icon -->
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 20h18L14 6l-4 7-3-4-4 11z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900">
+              Trail-to-Road Effort Converter
+            </h1>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-trail-50 text-trail-800 border border-trail-700/20">
+              Standar ITRA Km-Effort
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 hidden sm:block">
+            Ubah spesifikasi rute trail (Jarak &amp; Elevasi D+) menjadi ekuivalen jarak &amp; waktu lari di jalan raya datar.
+          </p>
+        </div>
+      </div>
+
+      <a href="#metodologi" class="text-xs sm:text-sm font-semibold text-slate-700 hover:text-trail-800 px-3 py-2 rounded-lg hover:bg-stone-100 transition-colors shrink-0">
+        Cara Hitung &darr;
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex-1 space-y-6">
+
+    <!-- MOBILE INTRO SUBTITLE -->
+    <p class="text-sm text-slate-600 sm:hidden leading-relaxed">
+      Ukur seberapa berat rute trail pilihanmu jika disetarakan dengan lari di aspal datar, lengkap dengan perkiraan waktu tempuh dari pace road kamu.
+    </p>
+
+    <!-- ZONA 2: QUICK PRESETS BAR (Skenario Populer & Lomba Ikonik Indonesia) -->
+    <section aria-labelledby="presets-heading" class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+        <h2 id="presets-heading" class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-trail-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Coba Preset Rute &amp; Lomba Ikonik (1-Klik):
+        </h2>
+        <span class="text-xs text-slate-500">Pilih skenario untuk mengisi kalkulator secara instan</span>
+      </div>
+
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Preset Skenario Rute Trail">
+        <!-- Preset 1: Inactive -->
+        <button type="button" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-stone-50 hover:border-slate-400 transition-all cursor-pointer">
+          <span>10K Short Trail</span>
+          <span class="text-slate-500 font-mono text-[11px]">(D+ 400m)</span>
+        </button>
+
+        <!-- Preset 2: ACTIVE / SELECTED STATE -->
+        <button type="button" aria-pressed="true" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold bg-trail-800 border border-trail-800 text-white shadow-xs transition-all cursor-pointer">
+          <span class="w-2 h-2 rounded-full bg-emerald-300" aria-hidden="true"></span>
+          <span>Tahura / 21K Half Trail</span>
+          <span class="text-emerald-100 font-mono text-[11px]">(D+ 1.000m)</span>
+        </button>
+
+        <!-- Preset 3: Inactive -->
+        <button type="button" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-stone-50 hover:border-slate-400 transition-all cursor-pointer">
+          <span>Siksorogo / 15K Steep</span>
+          <span class="text-slate-500 font-mono text-[11px]">(D+ 1.200m)</span>
+        </button>
+
+        <!-- Preset 4: Inactive -->
+        <button type="button" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-stone-50 hover:border-slate-400 transition-all cursor-pointer">
+          <span>50K Ultra Mountain</span>
+          <span class="text-slate-500 font-mono text-[11px]">(D+ 3.000m)</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 2-COLUMN ASYMMETRIC GRID: ZONA 3 (INPUT) & ZONA 4 (RESULT DASHBOARD) -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+
+      <!-- ZONA 3: PANEL INPUT RUTE & KEMAMPUAN (5 Kolom di Desktop) -->
+      <section aria-labelledby="input-panel-heading" class="md:col-span-5 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
+          <div>
+            <h2 id="input-panel-heading" class="text-base font-bold text-slate-900">
+              Parameter Rute &amp; Pace
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Hasil dihitung otomatis saat angka diketik</p>
+          </div>
+          <button type="button" class="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-stone-100 hover:bg-stone-200/80 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">
+            Reset
+          </button>
+        </div>
+
+        <!-- 3A. INPUT INTI: JARAK & ELEVASI D+ -->
+        <div class="space-y-4">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-500">
+            1. Spesifikasi Rute Trail (Wajib)
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Field: Jarak Trail -->
+            <div>
+              <label for="input-distance" class="block text-sm font-semibold text-slate-800 mb-1.5">
+                Jarak Rute Trail
+              </label>
+              <div class="relative flex items-center">
+                <input
+                  id="input-distance"
+                  type="number"
+                  inputmode="decimal"
+                  step="0.1"
+                  min="0.1"
+                  max="500"
+                  value="21"
+                  placeholder="Misal: 21"
+                  class="w-full h-12 pl-3.5 pr-12 text-lg font-mono font-semibold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:border-trail-700 focus:ring-3 focus:ring-trail-700/20 focus:outline-none transition-all"
+                />
+                <span class="absolute right-1.5 px-2 py-1 text-xs font-bold text-slate-600 bg-stone-100 rounded-md pointer-events-none">
+                  km
+                </span>
+              </div>
+              <p class="mt-1.5 text-xs text-slate-500 leading-snug">
+                Jarak horizontal sesuai info lomba/GPX.
+              </p>
+            </div>
+
+            <!-- Field: Total Tanjakan D+ -->
+            <div>
+              <label for="input-elevation" class="block text-sm font-semibold text-slate-800 mb-1.5">
+                Total Tanjakan (D+)
+              </label>
+              <div class="relative flex items-center">
+                <input
+                  id="input-elevation"
+                  type="number"
+                  inputmode="numeric"
+                  step="50"
+                  min="0"
+                  max="25000"
+                  value="1000"
+                  placeholder="Misal: 1000"
+                  class="w-full h-12 pl-3.5 pr-14 text-lg font-mono font-semibold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:border-trail-700 focus:ring-3 focus:ring-trail-700/20 focus:outline-none transition-all"
+                />
+                <span class="absolute right-1.5 px-2 py-1 text-xs font-bold text-terracotta-700 bg-terracotta-50 border border-terracotta-600/20 rounded-md pointer-events-none">
+                  m D+
+                </span>
+              </div>
+              <p class="mt-1.5 text-xs text-slate-500 leading-snug">
+                Kumulatif naik (100m D+ = +1 km datar).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3B. TERRAIN TECHNICALITY SELECTOR -->
+        <div class="space-y-2.5 pt-2 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-500">
+              2. Karakteristik Medan (Terrain Modifier)
+            </label>
+          </div>
+
+          <div class="space-y-2.5" role="radiogroup" aria-label="Pilih Tingkat Kesulitan Medan">
+            <!-- Option 1: Runable (+0%) -->
+            <div role="radio" aria-checked="false" tabindex="0" class="p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-stone-50/80 hover:border-slate-300 transition-all cursor-pointer flex items-start gap-3">
+              <div class="mt-0.5 w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-sm font-bold text-slate-800">Runable / Fire Road</span>
+                  <span class="px-2 py-0.5 text-[11px] font-mono font-bold rounded-md bg-slate-100 text-slate-700">+0% Effort</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-1 leading-snug">
+                  Tanah padat, jalur lebar, minim hambatan teknis (Standar ITRA murni).
+                </p>
+              </div>
+            </div>
+
+            <!-- Option 2: Moderate Singletrack (+10%) — SELECTED -->
+            <div role="radio" aria-checked="true" tabindex="0" class="p-3.5 rounded-xl border-2 border-trail-700 bg-trail-50/70 shadow-xs transition-all cursor-pointer flex items-start gap-3">
+              <div class="mt-0.5 w-4 h-4 rounded-full bg-trail-700 flex items-center justify-center shrink-0">
+                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-sm font-bold text-slate-900">Moderate Singletrack</span>
+                  <span class="px-2 py-0.5 text-[11px] font-mono font-bold rounded-md bg-trail-800 text-white">+10% Effort</span>
+                </div>
+                <p class="text-xs text-slate-700 mt-1 leading-snug">
+                  Jalur setapak hutan, akar pohon, tanah gembur, dan bebatuan sedang.
+                </p>
+              </div>
+            </div>
+
+            <!-- Option 3: Technical / Rocky (+20%) -->
+            <div role="radio" aria-checked="false" tabindex="0" class="p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-stone-50/80 hover:border-slate-300 transition-all cursor-pointer flex items-start gap-3">
+              <div class="mt-0.5 w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-sm font-bold text-slate-800">Technical / Rocky / Muddy</span>
+                  <span class="px-2 py-0.5 text-[11px] font-mono font-bold rounded-md bg-terracotta-50 text-terracotta-700 border border-terracotta-600/20">+20% Effort</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-1 leading-snug">
+                  Batu lepas, lumpur licin, tanjakan/turunan curam yang memaksa jalan kaki.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3C. INPUT OPSIONAL: FLAT ROAD PACE -->
+        <div class="space-y-3 pt-2 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <label for="input-pace-min" class="text-xs font-bold uppercase tracking-wider text-slate-500">
+              3. Kemampuan Lari Datar (Opsional)
+            </label>
+            <span class="text-[11px] font-semibold text-trail-800 bg-trail-50 px-2 py-0.5 rounded-md">
+              Untuk Estimasi Waktu
+            </span>
+          </div>
+
+          <div>
+            <div class="text-sm font-semibold text-slate-800 mb-1.5">
+              Flat Road Pace Anda
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="relative flex-1 flex items-center">
+                <input
+                  id="input-pace-min"
+                  type="number"
+                  inputmode="numeric"
+                  min="2"
+                  max="20"
+                  value="6"
+                  aria-label="Menit per kilometer"
+                  class="w-full h-12 pl-3.5 pr-12 text-lg font-mono font-semibold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:border-trail-700 focus:ring-3 focus:ring-trail-700/20 focus:outline-none"
+                />
+                <span class="absolute right-2 px-1.5 py-0.5 text-xs font-semibold text-slate-500 bg-stone-100 rounded pointer-events-none">
+                  mnt
+                </span>
+              </div>
+              <span class="text-xl font-mono font-bold text-slate-400">:</span>
+              <div class="relative flex-1 flex items-center">
+                <input
+                  id="input-pace-sec"
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  max="59"
+                  value="00"
+                  aria-label="Detik per kilometer"
+                  class="w-full h-12 pl-3.5 pr-12 text-lg font-mono font-semibold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:border-trail-700 focus:ring-3 focus:ring-trail-700/20 focus:outline-none"
+                />
+                <span class="absolute right-2 px-1.5 py-0.5 text-xs font-semibold text-slate-500 bg-stone-100 rounded pointer-events-none">
+                  dtk
+                </span>
+              </div>
+              <span class="text-sm font-bold text-slate-600 shrink-0 pl-1">/ km</span>
+            </div>
+            <p class="mt-1.5 text-xs text-slate-500 leading-snug">
+              Masukkan pace nyaman Anda saat <em>long run</em> di jalan raya datar (misal 06:00/km).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ZONA 4: RESULT DASHBOARD (7 Kolom di Desktop, Sticky) -->
+      <section aria-labelledby="result-heading" aria-live="polite" aria-atomic="true" class="md:col-span-7 md:sticky md:top-20 space-y-4">
+
+        <!-- 4A & 4B. HERO METRIC CARD (Asphalt Slate Dark Theme) -->
+        <div class="bg-asphalt-900 text-white rounded-2xl p-6 sm:p-7 shadow-xl border border-slate-800 space-y-6">
+
+          <!-- Top Eyebrow & ITRA Category Badge -->
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span id="result-heading" class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              Ekuivalen Jarak Jalan Raya (Road Equivalent)
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-blue-950/90 text-blue-200 border border-blue-700/50">
+              <span>Kategori ITRA XS</span>
+              <span class="text-blue-400">•</span>
+              <span>20–34 Km-Effort</span>
+            </span>
+          </div>
+
+          <!-- Primary Hero Number & Benchmark -->
+          <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-5 border-b border-slate-800">
+            <div>
+              <div class="flex items-baseline gap-2.5">
+                <span class="text-5xl sm:text-6xl font-mono font-extrabold tracking-tight tabular-nums text-white">
+                  34.1
+                </span>
+                <span class="text-2xl font-bold text-slate-300">km di aspal</span>
+              </div>
+              <p class="text-sm text-slate-300 mt-2 font-medium">
+                Beban fisik rute ini setara lari <strong class="text-white font-bold underline decoration-emerald-500/70 decoration-2 underline-offset-4">~1.6x Half Marathon (21.1K)</strong> di jalan raya datar.
+              </p>
+            </div>
+
+            <!-- Extra Effort Pill -->
+            <div class="inline-flex sm:flex-col items-start sm:items-end justify-between bg-slate-800/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 shrink-0">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Ekstra Beban</span>
+              <span class="text-lg sm:text-xl font-mono font-extrabold text-amber-400 tabular-nums">+62.4%</span>
+              <span class="text-[11px] text-slate-400 hidden sm:inline">vs 21.0 km datar</span>
+            </div>
+          </div>
+
+          <!-- Transparent Breakdown: Base ITRA vs Terrain Adjustment -->
+          <div class="space-y-2.5">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Rincian Transparan Pembentuk Beban (Km-Effort)
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <!-- Box 1: Jarak Asli + Tanjakan = Base ITRA -->
+              <div class="bg-slate-800/60 border border-slate-700/70 rounded-xl p-3">
+                <div class="text-xs text-slate-400">Standar Murni ITRA</div>
+                <div class="text-lg font-mono font-bold text-white tabular-nums mt-0.5">31.0 Km-Effort</div>
+                <div class="text-[11px] text-slate-400 mt-1 font-mono">
+                  21.0 km + 10.0 km (D+)
+                </div>
+              </div>
+
+              <!-- Box 2: Tambahan Elevasi -->
+              <div class="bg-slate-800/60 border border-slate-700/70 rounded-xl p-3">
+                <div class="text-xs text-slate-400">Kontribusi Tanjakan</div>
+                <div class="text-lg font-mono font-bold text-emerald-400 tabular-nums mt-0.5">+10.0 km</div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                  Dari D+ 1.000m (100m = 1km)
+                </div>
+              </div>
+
+              <!-- Box 3: Penalti Medan -->
+              <div class="bg-slate-800/60 border border-slate-700/70 rounded-xl p-3">
+                <div class="text-xs text-slate-400">Koreksi Medan (+10%)</div>
+                <div class="text-lg font-mono font-bold text-amber-300 tabular-nums mt-0.5">+3.1 km</div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                  Moderate Singletrack
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4C. ESTIMASI WAKTU TEMPUH & EFFECTIVE TRAIL PACE -->
+          <div class="bg-gradient-to-br from-trail-900/90 to-slate-900 border border-trail-700/50 rounded-xl p-4 sm:p-5 space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Estimasi Waktu &amp; Effective Trail Pace
+              </div>
+              <span class="text-xs text-emerald-200/90 font-mono">
+                Basis Road Pace: 06:00 /km
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div class="bg-slate-950/50 rounded-lg p-3.5 border border-white/10">
+                <div class="text-xs text-slate-300">Perkiraan Waktu Tempuh</div>
+                <div class="text-2xl sm:text-3xl font-mono font-extrabold text-white tabular-nums mt-1">
+                  3 jam 25 mnt
+                </div>
+                <div class="text-xs text-slate-400 mt-1 font-mono">
+                  Total ~205 menit (34.1 km &times; 6:00)
+                </div>
+              </div>
+
+              <div class="bg-slate-950/50 rounded-lg p-3.5 border border-white/10">
+                <div class="text-xs text-slate-300">Effective Trail Pace (Rata-rata)</div>
+                <div class="text-2xl sm:text-3xl font-mono font-extrabold text-emerald-400 tabular-nums mt-1">
+                  09:45 <span class="text-base font-sans font-semibold text-slate-300">/km</span>
+                </div>
+                <div class="text-xs text-amber-300 mt-1 font-mono">
+                  +03:45 /km lebih lambat dari road
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4E. TOMBOL AKSI: SALIN RINGKASAN KE WHATSAPP / STRAVA -->
+          <div class="pt-1">
+            <button
+              type="button"
+              class="w-full py-3.5 px-5 rounded-xl bg-trail-700 hover:bg-trail-600 active:bg-trail-800 text-white font-bold text-sm sm:text-base shadow-md flex items-center justify-center gap-2.5 transition-all cursor-pointer focus:outline-none focus:ring-4 focus:ring-emerald-500/40"
+            >
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              <span>Salin Ringkasan ke WhatsApp / Strava</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- REFERENSI VISUAL STATE KOMPONEN UNTUK ENGINEER (Dapat disembunyikan/dikondisikan secara dinamis) -->
+        <div class="bg-white rounded-2xl p-5 border border-dashed border-slate-300 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Spesifikasi Visual Conditional States (Panduan Implementasi Engineer)
+            </span>
+            <span class="text-[11px] font-medium text-slate-500 bg-stone-100 px-2 py-0.5 rounded">
+              State Library Preview
+            </span>
+          </div>
+
+          <!-- State A: Extreme Ultra Distance Warning (>= 50 Km-Effort) -->
+          <div class="rounded-xl bg-amber-50 border border-amber-300 p-4 text-amber-900 flex items-start gap-3" role="alert">
+            <svg class="w-5 h-5 text-amber-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div class="text-xs leading-relaxed">
+              <strong class="font-bold block text-amber-950 mb-0.5">
+                [State 1: Extreme Ultra Warning — Tampil Otomatis Jika Hasil &ge; 50 Km-Effort]
+              </strong>
+              Perhatian Jarak Ultra (Fatigue Decay): Di atas 50 Km-Effort, kelelahan otot <em>quadriceps</em> pada turunan dan jeda nutrisi di <em>Water Station</em> membuat perlambatan bersifat non-linear. Siapkan cadangan waktu ekstra <strong>15%&ndash;25%</strong> dari estimasi linear di atas.
+            </div>
+          </div>
+
+          <!-- State B: Validation Error State Preview -->
+          <div class="rounded-xl bg-red-50/70 border border-red-300 p-3.5 text-red-900 flex items-start gap-3">
+            <svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="text-xs leading-relaxed">
+              <strong class="font-bold block text-red-800 mb-0.5">
+                [State 2: Invalid Input Error — Tampil Jika Input Negatif / Kosong / &gt; Maks]
+              </strong>
+              Jarak rute belum valid. Masukkan angka jarak lebih dari 0 km hingga 500 km (contoh: 15 atau 21.5).
+            </div>
+          </div>
+
+          <!-- State C: Copy Button Feedback State Preview -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50 border border-emerald-300 rounded-xl p-3.5">
+            <div class="text-xs text-emerald-900">
+              <strong class="font-bold block">[State 3: Copy Summary Feedback State (Aktif 2.5 Detik)]</strong>
+              Tombol berubah menjadi hijau emerald saat teks berhasil disalin ke clipboard.
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-700 text-white text-xs font-bold shrink-0">
+              <span>&check; Tersalin! Siap ditempel ke grup lari</span>
+            </span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ZONA 5: TRANSPARANSI METODOLOGI & TABEL KATEGORI ITRA -->
+    <section id="metodologi" aria-labelledby="methodology-heading" class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-xs space-y-5 mt-8">
+      <div class="border-b border-slate-100 pb-4">
+        <span class="text-xs font-bold uppercase tracking-wider text-trail-700">Transparansi Perhitungan</span>
+        <h2 id="methodology-heading" class="text-lg font-bold text-slate-900 mt-0.5">
+          Bagaimana Angka Ini Dihitung?
+        </h2>
+        <p class="text-sm text-slate-600 mt-1">
+          Kami menggabungkan standar resmi dunia <em>trail running</em> (ITRA) dengan penyesuaian teknis permukaan jalur agar Anda tidak terjebak perhitungan mental yang terlalu optimis.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Card 1 -->
+        <div class="bg-stone-50/80 rounded-xl p-4 border border-slate-200/80 space-y-2">
+          <div class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-trail-800 text-white font-mono text-xs font-bold">
+            1
+          </div>
+          <h3 class="text-sm font-bold text-slate-900">Standar ITRA Km-Effort</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Setiap kenaikan vertikal <strong>100 meter (D+)</strong> dihitung setara dengan tambahan <strong>+1 km jarak lari datar</strong>.
+          </p>
+          <div class="p-2.5 bg-white rounded-lg border border-slate-200 font-mono text-xs text-slate-800">
+            Km-Effort = Jarak (km) + (D+ / 100)
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-stone-50/80 rounded-xl p-4 border border-slate-200/80 space-y-2">
+          <div class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-trail-800 text-white font-mono text-xs font-bold">
+            2
+          </div>
+          <h3 class="text-sm font-bold text-slate-900">Faktor Teknis Medan (Surface)</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Rumus ITRA murni tidak membedakan jalur tanah mulus dan jalur batu vulkanik/lumpur. Kami menambahkan pengali permukaan:
+          </p>
+          <ul class="text-xs text-slate-700 font-mono space-y-1 pl-1">
+            <li>• Runable: <strong>&times;1.00 (+0%)</strong></li>
+            <li>• Moderate: <strong>&times;1.10 (+10%)</strong></li>
+            <li>• Technical: <strong>&times;1.20 (+20%)</strong></li>
+          </ul>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-stone-50/80 rounded-xl p-4 border border-slate-200/80 space-y-2">
+          <div class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-trail-800 text-white font-mono text-xs font-bold">
+            3
+          </div>
+          <h3 class="text-sm font-bold text-slate-900">Estimasi Waktu &amp; Effective Pace</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Waktu tempuh dihitung dari <em>Adjusted Road Equivalent</em> dikalikan <em>Flat Road Pace</em> Anda, lalu dibagi jarak aktual untuk mendapatkan <em>Effective Trail Pace</em>.
+          </p>
+          <div class="p-2.5 bg-white rounded-lg border border-slate-200 font-mono text-xs text-slate-800">
+            Waktu = Adjusted Km &times; Road Pace
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 text-center text-xs text-slate-500 border-t border-slate-200/70 mt-6">
+    Trail-to-Road Effort Converter MVP &bull; Dirancang untuk membantu pelari merencanakan beban latihan dan strategi lomba secara akurat.
+  </footer>
+
+</body>
+</html>

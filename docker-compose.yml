@@ -1,0 +1,32 @@
+services:
+  trail-effort-converter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: trail-effort-converter:1.0.0
+    container_name: trail-effort-converter
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=16m
+      - /var/cache/nginx:uid=101,gid=101,size=16m
+      - /var/run:uid=101,gid=101,size=4m
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 64M
+        reservations:
+          cpus: "0.10"
+          memory: 16M
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8080/health.json"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
